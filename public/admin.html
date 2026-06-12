@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Portal — 10-Year Certainty School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family:'Inter',sans-serif; background:#0f172a; color:#f1f5f9; margin:0; }
+  .input-field { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:11px 14px; color:#f1f5f9; font-size:14px; outline:none; transition:.2s; box-sizing:border-box; }
+  .input-field:focus { border-color:#059669; background:rgba(5,150,105,0.06); }
+  .input-field::placeholder { color:#475569; }
+  label { font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:.06em; display:block; margin-bottom:5px; }
+  .btn { padding:10px 18px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:.2s; display:inline-flex; align-items:center; gap:7px; }
+  .btn-primary { background:linear-gradient(135deg,#059669,#047857); color:#fff; }
+  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(5,150,105,0.4); }
+  .btn-danger { background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.25); }
+  .btn-danger:hover { background:rgba(239,68,68,0.25); }
+  .btn-sm { padding:7px 14px; font-size:12px; border-radius:8px; }
+  .card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px; }
+  .tab { padding:10px 20px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:500; color:#94a3b8; transition:.2s; border:none; background:transparent; }
+  .tab.active { background:rgba(5,150,105,0.15); color:#34d399; border:1px solid rgba(5,150,105,0.25); }
+  .badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:100px; font-size:11px; font-weight:600; }
+  .badge-pending { background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); }
+  .badge-verified { background:rgba(5,150,105,0.15); color:#34d399; border:1px solid rgba(5,150,105,0.2); }
+  .msg-bubble { padding:9px 13px; border-radius:12px; max-width:80%; font-size:12px; line-height:1.5; word-break:break-word; }
+  .msg-user { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); align-self:flex-start; }
+  .msg-admin { background:rgba(5,150,105,0.2); border:1px solid rgba(5,150,105,0.25); align-self:flex-end; }
+  .chat-session { padding:12px; border-radius:12px; cursor:pointer; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02); transition:.2s; }
+  .chat-session:hover, .chat-session.active { background:rgba(5,150,105,0.08); border-color:rgba(5,150,105,0.2); }
+  .toast { position:fixed; top:20px; right:20px; z-index:9999; padding:13px 18px; border-radius:10px; font-size:13px; background:#059669; color:white; transform:translateX(130%); transition:transform .35s cubic-bezier(.4,0,.2,1); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  .toast.show { transform:translateX(0); }
+  #loginOverlay { position:fixed; inset:0; background:#0f172a; z-index:1000; display:flex; align-items:center; justify-content:center; }
+  ::-webkit-scrollbar { width:5px; height:5px; }
+  ::-webkit-scrollbar-thumb { background:rgba(5,150,105,0.35); border-radius:3px; }
+  .scrollbar-chat { overflow-y:auto; }
+</style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay">
+  <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:40px; width:360px; max-width:90vw;">
+    <div class="text-center mb-8">
+      <div style="width:56px;height:56px;background:rgba(5,150,105,0.15);border:1px solid rgba(5,150,105,0.3);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <i class="fas fa-lock" style="color:#34d399;font-size:22px;"></i>
+      </div>
+      <h1 style="font-size:22px;font-weight:700;color:white;margin-bottom:6px;">Admin Portal</h1>
+      <p style="color:#64748b;font-size:13px;">10-Year Certainty School</p>
+    </div>
+    <div>
+      <label>Admin Password</label>
+      <input type="password" id="loginPwd" class="input-field" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <div id="loginErr" style="color:#f87171;font-size:12px;margin-top:8px;display:none;"></div>
+      <button onclick="doLogin()" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:16px;">
+        <i class="fas fa-sign-in-alt"></i>Login
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp" style="display:none;">
+  <!-- Sidebar + main layout -->
+  <div style="display:flex;height:100vh;overflow:hidden;">
+
+    <!-- Sidebar -->
+    <div style="width:220px;flex-shrink:0;background:rgba(255,255,255,0.02);border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;padding:20px 12px;" id="sidebar">
+      <div style="padding:8px 12px 24px;">
+        <p style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.1em;font-weight:600;">School Admin</p>
+        <p style="font-size:15px;font-weight:700;color:white;margin-top:2px;">Control Panel</p>
+      </div>
+      <nav style="display:flex;flex-direction:column;gap:4px;flex:1;">
+        <button class="tab active" id="tab-dashboard" onclick="showTab('dashboard')"><i class="fas fa-tachometer-alt mr-2"></i>Dashboard</button>
+        <button class="tab" id="tab-donors" onclick="showTab('donors')"><i class="fas fa-users mr-2"></i>Donors <span id="pendingBadge" class="hidden ml-auto text-amber-400 text-xs font-bold"></span></button>
+        <button class="tab" id="tab-videos" onclick="showTab('videos')"><i class="fas fa-video mr-2"></i>Videos</button>
+        <button class="tab" id="tab-chat" onclick="showTab('chat')"><i class="fas fa-comments mr-2"></i>Live Chat <span id="chatNotifBadge" class="hidden ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"></span></button>
+      </nav>
+      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:16px;">
+        <a href="/" target="_blank" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px;padding:8px;border-radius:8px;transition:.2s;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#64748b'">
+          <i class="fas fa-external-link-alt"></i>View Public Site
+        </a>
+        <button onclick="doLogout()" style="font-size:12px;color:#64748b;background:none;border:none;cursor:pointer;width:100%;text-align:left;padding:8px;border-radius:8px;display:flex;align-items:center;gap:6px;" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='#64748b'">
+          <i class="fas fa-sign-out-alt"></i>Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div style="flex:1;overflow-y:auto;padding:24px;" id="mainContent">
+
+      <!-- DASHBOARD TAB -->
+      <div id="panel-dashboard">
+        <h2 style="font-size:20px;font-weight:700;color:white;margin-bottom:20px;">Dashboard</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px;">
+          <div class="card"><p style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.1em;">Total Raised</p><p class="font-mono" style="font-size:22px;font-weight:700;color:#34d399;margin-top:4px;" id="dash-raised">—</p></div>
+          <div class="card"><p style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.1em;">Goal</p><p class="font-mono" style="font-size:22px;font-weight:700;color:white;margin-top:4px;">₹5.77 Cr</p></div>
+          <div class="card"><p style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.1em;">Progress</p><p class="font-mono" style="font-size:22px;font-weight:700;color:#60a5fa;margin-top:4px;" id="dash-pct">—</p></div>
+          <div class="card"><p style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.1em;">Verified Donors</p><p class="font-mono" style="font-size:22px;font-weight:700;color:white;margin-top:4px;" id="dash-donors">—</p></div>
+          <div class="card"><p style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.1em;">Pending Verification</p><p class="font-mono" style="font-size:22px;font-weight:700;color:#fbbf24;margin-top:4px;" id="dash-pending">—</p></div>
+        </div>
+
+        <!-- Update funds -->
+        <div class="card" style="margin-bottom:20px;">
+          <h3 style="font-size:15px;font-weight:600;color:white;margin-bottom:16px;"><i class="fas fa-edit mr-2" style="color:#34d399;"></i>Update Funds Raised</h3>
+          <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+            <div style="flex:1;min-width:200px;">
+              <label>Total Funds Raised Till Now (₹)</label>
+              <input type="number" id="fundsInput" class="input-field" placeholder="e.g. 4500000"/>
+            </div>
+            <button onclick="saveFunds()" class="btn btn-primary"><i class="fas fa-save"></i>Save & Broadcast</button>
+          </div>
+        </div>
+
+        <!-- Push test -->
+        <div class="card">
+          <h3 style="font-size:15px;font-weight:600;color:white;margin-bottom:16px;"><i class="fas fa-bell mr-2" style="color:#fbbf24;"></i>Push Notifications</h3>
+          <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Enable browser notifications to receive alerts when someone donates or chats — even when this tab is closed.</p>
+          <button onclick="enablePush()" class="btn btn-primary btn-sm"><i class="fas fa-bell"></i>Enable Push Notifications</button>
+          <span id="pushStatus" style="font-size:12px;color:#64748b;margin-left:12px;"></span>
+        </div>
+      </div>
+
+      <!-- DONORS TAB -->
+      <div id="panel-donors" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+          <h2 style="font-size:20px;font-weight:700;color:white;">Donor Management</h2>
+          <div style="display:flex;gap:8px;">
+            <select id="donorFilter" class="input-field" style="width:auto;padding:8px 12px;font-size:13px;" onchange="loadDonors()">
+              <option value="all">All Donors</option>
+              <option value="pending">Pending</option>
+              <option value="verified">Verified</option>
+            </select>
+            <button onclick="loadDonors()" class="btn btn-primary btn-sm"><i class="fas fa-sync"></i>Refresh</button>
+          </div>
+        </div>
+        <div id="donorTable" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+
+      <!-- VIDEOS TAB -->
+      <div id="panel-videos" style="display:none;">
+        <h2 style="font-size:20px;font-weight:700;color:white;margin-bottom:20px;">Video Management</h2>
+        <div class="card" style="margin-bottom:20px;">
+          <h3 style="font-size:14px;font-weight:600;color:white;margin-bottom:14px;"><i class="fas fa-plus-circle mr-2" style="color:#34d399;"></i>Add YouTube Video</h3>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:250px;">
+              <label>YouTube Embed URL</label>
+              <input type="text" id="videoUrl" class="input-field" placeholder="https://www.youtube.com/embed/VIDEO_ID"/>
+            </div>
+            <button onclick="addVideo()" class="btn btn-primary" style="align-self:flex-end;"><i class="fas fa-plus"></i>Add Video</button>
+          </div>
+          <p style="font-size:11px;color:#475569;margin-top:8px;">Use the embed URL format: youtube.com/embed/VIDEO_ID</p>
+        </div>
+        <div id="videoList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;"></div>
+      </div>
+
+      <!-- CHAT TAB -->
+      <div id="panel-chat" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+          <h2 style="font-size:20px;font-weight:700;color:white;">Live Chat</h2>
+          <button onclick="clearAllChats()" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i>Clear All Chats</button>
+        </div>
+        <div style="display:grid;grid-template-columns:280px 1fr;gap:16px;height:calc(100vh - 160px);">
+          <!-- Sessions list -->
+          <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;" id="chatSessions"></div>
+          <!-- Chat window -->
+          <div class="card" style="display:flex;flex-direction:column;overflow:hidden;padding:0;">
+            <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <p style="font-size:14px;font-weight:600;color:white;" id="chatWindowName">Select a conversation</p>
+                <p style="font-size:11px;color:#64748b;" id="chatWindowPhone"></p>
+              </div>
+              <button id="clearSessionBtn" onclick="clearSession()" class="btn btn-danger btn-sm hidden"><i class="fas fa-trash"></i>Clear</button>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;" id="adminChatMessages"></div>
+            <div style="padding:12px;border-top:1px solid rgba(255,255,255,0.08);display:flex;gap:8px;" id="adminInputArea">
+              <input type="text" id="adminMsgInput" class="input-field" placeholder="Type admin reply..." onkeydown="if(event.key==='Enter')sendAdminMsg()" style="flex:1;"/>
+              <button onclick="sendAdminMsg()" class="btn btn-primary btn-sm"><i class="fas fa-paper-plane"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+let adminToken = localStorage.getItem('adminToken');
+let allDonors = [];
+let videoLinks = [];
+let currentSessionId = null;
+let sessions = [];
+let chatNotifCount = 0;
+
+const socket = io();
+socket.emit('joinAdmin');
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const pwd = document.getElementById('loginPwd').value;
+  try {
+    const r = await fetch('/api/admin/login', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ password: pwd })
+    });
+    const data = await r.json();
+    if (!r.ok) { document.getElementById('loginErr').textContent = data.error || 'Invalid password'; document.getElementById('loginErr').style.display='block'; return; }
+    adminToken = data.token;
+    localStorage.setItem('adminToken', adminToken);
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'flex';
+    initAdmin();
+  } catch { document.getElementById('loginErr').textContent = 'Server error. Ensure backend is running.'; document.getElementById('loginErr').style.display='block'; }
+}
+
+function doLogout() {
+  localStorage.removeItem('adminToken');
+  adminToken = null;
+  document.getElementById('adminApp').style.display = 'none';
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('loginPwd').value = '';
+}
+
+function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }; }
+
+async function initAdmin() {
+  await loadState();
+  await loadDonors();
+  await loadVideos();
+  await loadChatSessions();
+}
+
+// ─── State ────────────────────────────────────────────────────────────────────
+async function loadState() {
+  try {
+    const r = await fetch('/api/state');
+    const s = await r.json();
+    document.getElementById('fundsInput').value = s.currentRaised || '';
+    document.getElementById('dash-raised').textContent = formatINR(s.currentRaised || 0);
+    document.getElementById('dash-pct').textContent = ((s.currentRaised/57700000)*100).toFixed(1)+'%';
+    videoLinks = s.videoLinks || [];
+  } catch {}
+}
+
+async function saveFunds() {
+  const v = parseInt(document.getElementById('fundsInput').value);
+  if (isNaN(v) || v < 0) { showToast('Enter a valid amount','error'); return; }
+  try {
+    await fetch('/api/state', { method:'PUT', headers:authHeaders(), body:JSON.stringify({currentRaised:v}) });
+    document.getElementById('dash-raised').textContent = formatINR(v);
+    document.getElementById('dash-pct').textContent = ((v/57700000)*100).toFixed(1)+'%';
+    showToast('Funds updated & broadcast to all visitors!');
+  } catch { showToast('Error updating','error'); }
+}
+
+// ─── Donors ───────────────────────────────────────────────────────────────────
+async function loadDonors() {
+  try {
+    const r = await fetch('/api/donors', { headers: authHeaders() });
+    allDonors = await r.json();
+    const filter = document.getElementById('donorFilter')?.value || 'all';
+    renderDonors(filter === 'all' ? allDonors : allDonors.filter(d => filter === 'verified' ? d.verified : !d.verified));
+    const pending = allDonors.filter(d => !d.verified).length;
+    document.getElementById('dash-pending').textContent = pending;
+    document.getElementById('dash-donors').textContent = allDonors.filter(d => d.verified).length;
+    const badge = document.getElementById('pendingBadge');
+    if (pending > 0) { badge.textContent = pending; badge.classList.remove('hidden'); }
+    else badge.classList.add('hidden');
+  } catch {}
+}
+
+function renderDonors(donors) {
+  const el = document.getElementById('donorTable');
+  if (!donors.length) { el.innerHTML = '<p style="color:#475569;text-align:center;padding:32px;">No donors found.</p>'; return; }
+  el.innerHTML = donors.map(d => `
+    <div class="card" style="padding:16px;">
+      <div style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-weight:600;color:white;font-size:15px;">${esc(d.name)}</span>
+            <span class="badge ${d.verified?'badge-verified':'badge-pending'}">${d.verified?'✓ Verified':'⏳ Pending'}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px;font-size:12px;color:#94a3b8;">
+            <span><i class="fas fa-map-marker-alt mr-1 text-slate-500"></i>${esc(d.place)}</span>
+            <span><i class="fas fa-calendar mr-1 text-slate-500"></i>Age: ${d.age}</span>
+            ${d.phone?`<span><i class="fas fa-phone mr-1 text-slate-500"></i>${esc(d.phone)}</span>`:''}
+            ${d.email?`<span><i class="fas fa-envelope mr-1 text-slate-500"></i>${esc(d.email)}</span>`:''}
+            <span style="grid-column:1/-1;color:#94a3b8;"><i class="fas fa-home mr-1 text-slate-500"></i>${esc(d.address)}</span>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div class="font-mono" style="font-size:20px;font-weight:700;color:#34d399;">₹${d.amount.toLocaleString('en-IN')}</div>
+          <div style="font-size:11px;color:#475569;margin-bottom:10px;">${new Date(d.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</div>
+          <div style="display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;">
+            ${!d.verified ? `
+              <input type="text" id="txn_${d._id}" class="input-field" placeholder="Transaction ID" style="width:140px;font-size:11px;padding:6px 10px;"/>
+              <button onclick="verifyDonor('${d._id}')" class="btn btn-primary btn-sm"><i class="fas fa-check"></i>Verify</button>` : ''}
+            <button onclick="deleteDonor('${d._id}')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function verifyDonor(id) {
+  const txnInput = document.getElementById(`txn_${id}`);
+  const transactionId = txnInput ? txnInput.value.trim() : '';
+  try {
+    await fetch(`/api/donors/${id}/verify`, {
+      method:'PUT', headers: authHeaders(), body: JSON.stringify({ transactionId })
+    });
+    showToast('Donor verified & added to public leaderboard!');
+    loadDonors();
+  } catch { showToast('Error verifying donor','error'); }
+}
+
+async function deleteDonor(id) {
+  if (!confirm('Delete this donor permanently?')) return;
+  try {
+    await fetch(`/api/donors/${id}`, { method:'DELETE', headers:authHeaders() });
+    showToast('Donor removed');
+    loadDonors();
+  } catch { showToast('Error','error'); }
+}
+
+// ─── Videos ───────────────────────────────────────────────────────────────────
+async function loadVideos() {
+  const r = await fetch('/api/state');
+  const s = await r.json();
+  videoLinks = s.videoLinks || [];
+  renderVideos();
+}
+
+function renderVideos() {
+  const el = document.getElementById('videoList');
+  if (!videoLinks.length) { el.innerHTML = '<p style="color:#475569;text-align:center;padding:32px;grid-column:1/-1;">No videos added yet.</p>'; return; }
+  el.innerHTML = videoLinks.map((url, i) => `
+    <div class="card" style="padding:12px;">
+      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;margin-bottom:10px;">
+        <iframe src="${url}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <p style="flex:1;font-size:11px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${url}</p>
+        <button onclick="removeVideo(${i})" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+async function addVideo() {
+  const url = document.getElementById('videoUrl').value.trim();
+  if (!url || !url.includes('youtube.com/embed')) { showToast('Enter a valid YouTube embed URL','error'); return; }
+  try {
+    await fetch('/api/state/video', { method:'POST', headers:authHeaders(), body:JSON.stringify({url}) });
+    document.getElementById('videoUrl').value = '';
+    loadVideos();
+    showToast('Video added!');
+  } catch { showToast('Error','error'); }
+}
+
+async function removeVideo(i) {
+  if (!confirm('Remove this video?')) return;
+  try {
+    await fetch(`/api/state/video/${i}`, { method:'DELETE', headers:authHeaders() });
+    loadVideos();
+    showToast('Video removed');
+  } catch { showToast('Error','error'); }
+}
+
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+async function loadChatSessions() {
+  try {
+    const r = await fetch('/api/chat', { headers:authHeaders() });
+    sessions = await r.json();
+    renderSessions();
+  } catch {}
+}
+
+function renderSessions() {
+  const el = document.getElementById('chatSessions');
+  if (!sessions.length) { el.innerHTML = '<p style="color:#475569;font-size:13px;text-align:center;padding:24px;">No chat sessions yet.</p>'; return; }
+  el.innerHTML = sessions.map(s => `
+    <div class="chat-session ${currentSessionId===s._id?'active':''}" onclick="openSession('${s._id}','${esc(s.lastMessage.senderName)}','${esc(s.lastMessage.senderPhone)}')">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+        <span style="font-size:13px;font-weight:600;color:white;">${esc(s.lastMessage.senderName)}</span>
+        <span style="font-size:10px;color:#475569;">${new Date(s.lastMessage.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}</span>
+      </div>
+      <p style="font-size:11px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(s.lastMessage.message)}</p>
+      <p style="font-size:10px;color:#475569;margin-top:2px;">${s.lastMessage.senderPhone}</p>
+    </div>`).join('');
+}
+
+async function openSession(sessionId, name, phone) {
+  currentSessionId = sessionId;
+  document.getElementById('chatWindowName').textContent = name;
+  document.getElementById('chatWindowPhone').textContent = phone;
+  document.getElementById('clearSessionBtn').classList.remove('hidden');
+  socket.emit('joinChat', { sessionId });
+  renderSessions();
+
+  try {
+    const r = await fetch(`/api/chat/${sessionId}`);
+    const msgs = await r.json();
+    const container = document.getElementById('adminChatMessages');
+    container.innerHTML = '';
+    msgs.forEach(m => appendAdminMsg(m.message, m.isAdmin, m.senderName));
+  } catch {}
+}
+
+function appendAdminMsg(text, isAdmin, sender) {
+  const container = document.getElementById('adminChatMessages');
+  const div = document.createElement('div');
+  div.className = `msg-bubble ${isAdmin ? 'msg-admin' : 'msg-user'}`;
+  div.innerHTML = `${!isAdmin ? `<span style="font-size:10px;color:#34d399;font-weight:600;display:block;margin-bottom:3px;">${esc(sender||'User')}</span>` : ''}${esc(text)}`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendAdminMsg() {
+  const input = document.getElementById('adminMsgInput');
+  const msg = input.value.trim();
+  if (!msg || !currentSessionId) return;
+  socket.emit('chatMessage', {
+    senderName: 'Admin', senderPhone: 'admin',
+    message: msg, isAdmin: true, sessionId: currentSessionId
+  });
+  appendAdminMsg(msg, true, 'Admin');
+  input.value = '';
+}
+
+async function clearSession() {
+  if (!currentSessionId || !confirm('Clear this conversation?')) return;
+  await fetch(`/api/chat/${currentSessionId}`, { method:'DELETE', headers:authHeaders() });
+  document.getElementById('adminChatMessages').innerHTML = '';
+  currentSessionId = null;
+  document.getElementById('chatWindowName').textContent = 'Select a conversation';
+  document.getElementById('chatWindowPhone').textContent = '';
+  document.getElementById('clearSessionBtn').classList.add('hidden');
+  loadChatSessions();
+  showToast('Conversation cleared');
+}
+
+async function clearAllChats() {
+  if (!confirm('Clear ALL chat conversations? This cannot be undone.')) return;
+  await fetch('/api/chat', { method:'DELETE', headers:authHeaders() });
+  document.getElementById('adminChatMessages').innerHTML = '';
+  sessions = [];
+  renderSessions();
+  showToast('All chats cleared');
+}
+
+// Socket listeners
+socket.on('newMessage', (msg) => {
+  if (!msg.isAdmin) {
+    if (msg.sessionId === currentSessionId) appendAdminMsg(msg.message, false, msg.senderName);
+    loadChatSessions();
+    if (document.getElementById('panel-chat').style.display === 'none') {
+      chatNotifCount++;
+      const b = document.getElementById('chatNotifBadge');
+      b.textContent = chatNotifCount; b.classList.remove('hidden');
+    }
+  }
+});
+socket.on('stateUpdate', (s) => {
+  document.getElementById('dash-raised').textContent = formatINR(s.currentRaised||0);
+  document.getElementById('dash-pct').textContent = ((s.currentRaised/57700000)*100).toFixed(1)+'%';
+});
+socket.on('newDonor', loadDonors);
+
+// ─── Push ─────────────────────────────────────────────────────────────────────
+async function enablePush() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    showToast('Push not supported in this browser','error'); return;
+  }
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') { showToast('Notification permission denied','error'); return; }
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    const r = await fetch('/api/push/vapidPublicKey');
+    const { publicKey } = await r.json();
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey)
+    });
+    await fetch('/api/push/subscribe', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ subscription: sub, type: 'admin' })
+    });
+    document.getElementById('pushStatus').textContent = '✅ Push notifications enabled!';
+    document.getElementById('pushStatus').style.color = '#34d399';
+    showToast('Push notifications enabled!');
+  } catch(e) { showToast('Error enabling push: '+e.message,'error'); }
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  return Uint8Array.from([...window.atob(base64)].map(c => c.charCodeAt(0)));
+}
+
+// ─── Tabs ─────────────────────────────────────────────────────────────────────
+function showTab(name) {
+  ['dashboard','donors','videos','chat'].forEach(t => {
+    document.getElementById(`panel-${t}`).style.display = t===name?'block':'none';
+    document.getElementById(`tab-${t}`).classList.toggle('active', t===name);
+  });
+  if (name === 'chat') {
+    chatNotifCount = 0;
+    document.getElementById('chatNotifBadge').classList.add('hidden');
+  }
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function formatINR(n) {
+  if (n >= 10000000) return '₹'+(n/10000000).toFixed(2)+' Cr';
+  if (n >= 100000) return '₹'+(n/100000).toFixed(2)+' L';
+  return '₹'+n.toLocaleString('en-IN');
+}
+function esc(s='') { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.background = type==='error'?'#dc2626':'#059669';
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+// Auto-login if token exists
+if (adminToken) {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('adminApp').style.display = 'flex';
+  initAdmin();
+}
+</script>
+</body>
+</html>

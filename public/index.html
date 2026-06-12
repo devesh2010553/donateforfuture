@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The 10-Year Certainty School — UP Board | Child Beggar Rehabilitation</title>
+<meta name="description" content="A guaranteed 10-year funded school for rehabilitating child beggars in Uttar Pradesh. Construction begins only when ₹5.77 Crore is fully raised."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        emerald: { 50:'#ecfdf5',100:'#d1fae5',200:'#a7f3d0',300:'#6ee7b7',400:'#34d399',500:'#10b981',600:'#059669',700:'#047857',800:'#065f46',900:'#064e3b' },
+        slate: { 50:'#f8fafc',100:'#f1f5f9',800:'#1e293b',900:'#0f172a',950:'#020617' }
+      },
+      fontFamily: { display:['Playfair Display','serif'], body:['Inter','sans-serif'], mono:['JetBrains Mono','monospace'] }
+    }
+  }
+}
+</script>
+<style>
+  :root { --emerald: #059669; --emerald-dark: #047857; --gold: #d97706; }
+  * { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #0f172a; color: #f1f5f9; }
+
+  /* Hero gradient */
+  .hero-bg {
+    background: linear-gradient(135deg, #0f172a 0%, #064e3b 40%, #0f172a 100%);
+    position: relative; overflow: hidden;
+  }
+  .hero-bg::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(5,150,105,0.15) 0%, transparent 70%),
+                radial-gradient(ellipse at 70% 20%, rgba(217,119,6,0.08) 0%, transparent 50%);
+  }
+
+  /* Progress bar */
+  .progress-track { background: rgba(255,255,255,0.08); border-radius: 100px; overflow: hidden; }
+  .progress-fill {
+    height: 100%; border-radius: 100px;
+    background: linear-gradient(90deg, #059669, #34d399, #6ee7b7);
+    transition: width 1.5s cubic-bezier(.4,0,.2,1);
+    position: relative; overflow: hidden;
+  }
+  .progress-fill::after {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2.5s infinite;
+  }
+  @keyframes shimmer { to { left: 100%; } }
+
+  /* Cards */
+  .glass-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+  }
+  .pillar-card {
+    background: linear-gradient(135deg, rgba(5,150,105,0.08), rgba(255,255,255,0.03));
+    border: 1px solid rgba(5,150,105,0.2);
+  }
+
+  /* Donor leaderboard */
+  .rank-gold { color: #f59e0b; }
+  .rank-silver { color: #94a3b8; }
+  .rank-bronze { color: #b45309; }
+
+  /* Chat widget */
+  #chatWidget { position: fixed; bottom: 24px; right: 24px; z-index: 1000; }
+  #chatBox {
+    display: none; width: 340px; max-height: 520px;
+    background: #1e293b; border: 1px solid rgba(5,150,105,0.3);
+    border-radius: 20px; box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    flex-direction: column; overflow: hidden;
+  }
+  #chatBox.open { display: flex; }
+  #chatMessages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; max-height: 320px; }
+  .msg-bubble { padding: 10px 14px; border-radius: 14px; max-width: 85%; font-size: 13px; line-height: 1.5; word-break: break-word; }
+  .msg-user { background: rgba(5,150,105,0.25); border: 1px solid rgba(5,150,105,0.3); align-self: flex-end; }
+  .msg-admin { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); align-self: flex-start; }
+
+  /* Notification */
+  .toast { position: fixed; top: 24px; right: 24px; z-index: 9999; padding: 16px 20px; border-radius: 12px; background: #059669; color: white; font-size: 14px; transform: translateX(120%); transition: transform .4s cubic-bezier(.4,0,.2,1); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .toast.show { transform: translateX(0); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(5,150,105,0.4); border-radius: 3px; }
+
+  /* Donate modal */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; backdrop-filter:blur(4px); }
+  .modal-overlay.open { display:flex; align-items:center; justify-content:center; padding:16px; }
+  .modal-box { background:#1e293b; border:1px solid rgba(5,150,105,0.3); border-radius:20px; width:100%; max-width:480px; padding:32px; animation:slideUp .3s ease; }
+  @keyframes slideUp { from{transform:translateY(30px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+  .input-field { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:12px 16px; color:#f1f5f9; font-size:14px; outline:none; transition:.2s; }
+  .input-field:focus { border-color:#059669; background:rgba(5,150,105,0.06); }
+  .input-field::placeholder { color:#64748b; }
+  label { font-size:12px; color:#94a3b8; font-weight:500; text-transform:uppercase; letter-spacing:.06em; display:block; margin-bottom:6px; }
+
+  .btn-primary { background:linear-gradient(135deg,#059669,#047857); color:white; padding:14px 28px; border-radius:12px; font-weight:600; font-size:15px; border:none; cursor:pointer; transition:.2s; width:100%; }
+  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(5,150,105,0.4); }
+  .btn-secondary { background:rgba(255,255,255,0.06); color:#e2e8f0; padding:14px 28px; border-radius:12px; font-weight:500; font-size:15px; border:1px solid rgba(255,255,255,0.12); cursor:pointer; transition:.2s; }
+  .btn-secondary:hover { background:rgba(255,255,255,0.1); }
+
+  /* Section headers */
+  .section-eyebrow { font-size:11px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:#34d399; margin-bottom:12px; }
+
+  /* Responsive iframe */
+  .yt-wrap { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:16px; }
+  .yt-wrap iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+
+  @media(max-width:640px) { #chatBox { width: calc(100vw - 32px); right: 0; } }
+</style>
+</head>
+<body>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- NAV -->
+<nav class="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-lg border-b border-white/5">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-emerald-700/30 border border-emerald-600/30 flex items-center justify-center">
+        <i class="fas fa-school text-emerald-400 text-sm"></i>
+      </div>
+      <span class="font-display font-bold text-lg text-white leading-none">10-Year Certainty School</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="openDonateModal()" class="btn-primary py-2 px-5 text-sm rounded-lg" style="width:auto">
+        <i class="fas fa-heart mr-2"></i>Donate
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero-bg min-h-screen flex items-center py-24 px-4 sm:px-6 relative">
+  <div class="max-w-6xl mx-auto w-full relative z-10">
+    <div class="max-w-3xl">
+      <p class="section-eyebrow">Uttar Pradesh Board Registered · Child Beggar Rehabilitation</p>
+      <h1 class="font-display text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-6">
+        The <span class="text-emerald-400">10-Year</span><br/>Certainty School
+      </h1>
+      <p class="text-xl text-slate-300 leading-relaxed mb-4 max-w-2xl">
+        A school for street children that will <strong class="text-white">never shut down mid-way</strong>. Construction starts only when every rupee of the 10-year funded budget is secured — not a paisa before.
+      </p>
+      <p class="text-slate-400 text-base mb-10 max-w-xl">
+        We are rehabilitating child beggars off the streets of Uttar Pradesh, giving them a full UP Board education — from Nursery/KG to Class 12 — with guaranteed meals, books, and teachers for a decade.
+      </p>
+      <div class="flex flex-wrap gap-4">
+        <a href="#breakdown" class="btn-primary" style="width:auto; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+          <i class="fas fa-chart-pie"></i>View Financial Transparency
+        </a>
+        <button onclick="openDonateModal()" class="btn-secondary flex items-center gap-2">
+          <i class="fas fa-donate text-emerald-400"></i>Make a Donation
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Decorative -->
+  <div class="absolute right-0 top-0 h-full w-1/3 hidden lg:flex items-center justify-center opacity-10 pointer-events-none">
+    <i class="fas fa-graduation-cap" style="font-size:280px; color:#34d399;"></i>
+  </div>
+</section>
+
+<!-- LIVE PROGRESS -->
+<section class="py-16 px-4 sm:px-6 bg-slate-900">
+  <div class="max-w-4xl mx-auto">
+    <div class="glass-card rounded-3xl p-8 sm:p-12">
+      <p class="section-eyebrow text-center">Live Fundraising Progress</p>
+      <div class="text-center mb-8">
+        <span class="font-mono text-4xl sm:text-5xl font-bold text-emerald-400" id="raisedDisplay">₹45,00,000</span>
+        <span class="text-slate-400 text-xl"> raised of </span>
+        <span class="font-mono text-2xl text-white font-bold">₹5.77 Crore</span>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-track h-7 mb-4">
+        <div class="progress-fill h-full flex items-center justify-end pr-3" id="progressBar" style="width:0%">
+          <span class="text-xs font-bold text-white" id="progressPct">0%</span>
+        </div>
+      </div>
+
+      <!-- Milestone markers -->
+      <div class="flex justify-between text-xs text-slate-500 font-mono mb-6">
+        <span>₹0</span><span>₹1.44 Cr</span><span>₹2.89 Cr</span><span>₹4.33 Cr</span><span>₹5.77 Cr</span>
+      </div>
+
+      <!-- Status Badge -->
+      <div class="text-center">
+        <div id="statusBadge" class="inline-flex items-center gap-2 px-5 py-3 rounded-full border text-sm font-semibold">
+          <div class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
+          <span>Status: Awaiting Full Funding — Construction begins exactly at ₹5.77 Cr</span>
+        </div>
+      </div>
+
+      <!-- Key stats -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
+        <div class="text-center p-4 rounded-2xl bg-white/5">
+          <div class="text-2xl font-bold text-emerald-400 font-mono" id="daysCount">—</div>
+          <div class="text-xs text-slate-400 mt-1">Days Running</div>
+        </div>
+        <div class="text-center p-4 rounded-2xl bg-white/5">
+          <div class="text-2xl font-bold text-white font-mono" id="donorCount">0</div>
+          <div class="text-xs text-slate-400 mt-1">Verified Donors</div>
+        </div>
+        <div class="text-center p-4 rounded-2xl bg-white/5">
+          <div class="text-2xl font-bold text-white font-mono">20</div>
+          <div class="text-xs text-slate-400 mt-1">Staff Guaranteed</div>
+        </div>
+        <div class="text-center p-4 rounded-2xl bg-white/5">
+          <div class="text-2xl font-bold text-white font-mono">10</div>
+          <div class="text-xs text-slate-400 mt-1">Years Pre-Funded</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY FIXED FUNDING -->
+<section class="py-20 px-4 sm:px-6 bg-slate-950">
+  <div class="max-w-5xl mx-auto">
+    <p class="section-eyebrow text-center">The Promise</p>
+    <h2 class="font-display text-3xl sm:text-4xl font-bold text-white text-center mb-4">Why We Don't Accept Open-Ended Donations</h2>
+    <p class="text-slate-400 text-center max-w-2xl mx-auto mb-12">Most charitable schools collapse within 3–5 years due to funding gaps. We eliminate this risk entirely by securing the full 10-year operational budget before laying a single brick.</p>
+    <div class="grid sm:grid-cols-3 gap-6">
+      <div class="glass-card rounded-2xl p-6">
+        <div class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
+          <i class="fas fa-times-circle text-red-400 text-xl"></i>
+        </div>
+        <h3 class="font-semibold text-white mb-2">The Broken Promise</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Schools that begin construction on partial funds eventually run dry, leaving children mid-education and staff unpaid.</p>
+      </div>
+      <div class="pillar-card rounded-2xl p-6">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center mb-4">
+          <i class="fas fa-lock text-emerald-400 text-xl"></i>
+        </div>
+        <h3 class="font-semibold text-white mb-2">Our Guarantee</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">The full ₹5.77 Crore — covering construction and 10 full years of operations — must be in escrow before construction begins. Zero exceptions.</p>
+      </div>
+      <div class="glass-card rounded-2xl p-6">
+        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
+          <i class="fas fa-shield-alt text-amber-400 text-xl"></i>
+        </div>
+        <h3 class="font-semibold text-white mb-2">Donor Protection</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">If the full target is never met, all collected funds are returned. Your donation is either fully deployed or fully returned — never half-used.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BREAKDOWN -->
+<section id="breakdown" class="py-20 px-4 sm:px-6 bg-slate-900">
+  <div class="max-w-5xl mx-auto">
+    <p class="section-eyebrow text-center">Financial Transparency</p>
+    <h2 class="font-display text-3xl sm:text-4xl font-bold text-white text-center mb-3">The ₹5.77 Crore: Every Rupee Explained</h2>
+    <p class="text-slate-400 text-center max-w-xl mx-auto mb-12">Split into two inviolable pillars — no blending, no raiding operations for construction, or vice versa.</p>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+      <!-- CAPEX -->
+      <div class="pillar-card rounded-3xl p-8">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-11 h-11 rounded-xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center">
+            <i class="fas fa-building text-emerald-400"></i>
+          </div>
+          <div>
+            <p class="text-xs text-emerald-300 font-semibold uppercase tracking-wider">Pillar 1 — CAPEX</p>
+            <h3 class="text-xl font-bold text-white">Initial Infrastructure</h3>
+          </div>
+        </div>
+        <div class="text-3xl font-mono font-black text-emerald-400 mb-6">₹1.55 Crore</div>
+        <ul class="space-y-3 text-sm">
+          <li class="flex items-start gap-3"><i class="fas fa-check-circle text-emerald-500 mt-0.5 flex-shrink-0"></i><div><span class="text-white font-medium">3-Story Building on 2 Bighas</span><p class="text-slate-400 text-xs mt-0.5">Bare-minimum, robust RCC construction. No luxury finishes. Structural integrity over aesthetics.</p></div></li>
+          <li class="flex items-start gap-3"><i class="fas fa-check-circle text-emerald-500 mt-0.5 flex-shrink-0"></i><div><span class="text-white font-medium">14 Classrooms (NC/KG → Class 12)</span><p class="text-slate-400 text-xs mt-0.5">One classroom per grade level. Standard furniture, blackboards, basic lighting.</p></div></li>
+          <li class="flex items-start gap-3"><i class="fas fa-check-circle text-emerald-500 mt-0.5 flex-shrink-0"></i><div><span class="text-white font-medium">Basic Science & Computer Labs</span><p class="text-slate-400 text-xs mt-0.5">Functional labs meeting UP Board minimum requirements for senior secondary.</p></div></li>
+          <li class="flex items-start gap-3"><i class="fas fa-check-circle text-emerald-500 mt-0.5 flex-shrink-0"></i><div><span class="text-white font-medium">UP Board Compliance Infrastructure</span><p class="text-slate-400 text-xs mt-0.5">Library, principal's office, staff rooms, toilets, boundary wall as per UP Board norms.</p></div></li>
+          <li class="flex items-start gap-3"><i class="fas fa-check-circle text-emerald-500 mt-0.5 flex-shrink-0"></i><div><span class="text-white font-medium">Water, Electricity & Sanitation</span><p class="text-slate-400 text-xs mt-0.5">Borewell, solar panels for reduced recurring costs, separate toilets for girls.</p></div></li>
+        </ul>
+      </div>
+
+      <!-- OPEX -->
+      <div class="pillar-card rounded-3xl p-8" style="border-color:rgba(217,119,6,0.25); background:linear-gradient(135deg,rgba(217,119,6,0.06),rgba(255,255,255,0.02));">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-11 h-11 rounded-xl bg-amber-600/15 border border-amber-500/25 flex items-center justify-center">
+            <i class="fas fa-clock text-amber-400"></i>
+          </div>
+          <div>
+            <p class="text-xs text-amber-300 font-semibold uppercase tracking-wider">Pillar 2 — OPEX</p>
+            <h3 class="text-xl font-bold text-white">10-Year Running Runway</h3>
+          </div>
+        </div>
+        <div class="text-3xl font-mono font-black text-amber-400 mb-6">₹4.22 Crore</div>
+        <ul class="space-y-3 text-sm">
+          <li class="flex items-start gap-3"><i class="fas fa-check-circle text-amber-500 mt-0.5 flex-shrink-0"></i><div><span class="text-white font-medium">14 Teachers @ ₹8,000/month</span><p class="text-slate-400 text-xs mt-0.5">Enforced low-cost salary model. B.Ed. qualified, UP Board approved. Welfare mission over market rates.</p></div></li>
+          <li class="flex items-start gap-3"><i class="fas fa-check-circle text-amber-500 mt-0.5 flex-shrink-0"></i><div><span class="text-white font-medium">Principal + 5 Support Staff</span><p class="text-slate-400 text-xs mt-0.5">Administrative, peon, cook, security, and cleaning — all at set welfare rates.</p></div></li>
+          <li class="flex items-start gap-3"><i class="fas fa-check-circle text-amber-500 mt-0.5 flex-shrink-0"></i><div><span class="text-white font-medium">Daily Basic Nutrition Meals</span><p class="text-slate-400 text-xs mt-0.5">Mid-day meal program for every enrolled child. Dal, rice, sabzi — minimum nutrition, 10-year budget.</p></div></li>
+          <li class="flex items-start gap-3"><i class="fas fa-check-circle text-amber-500 mt-0.5 flex-shrink-0"></i><div><span class="text-white font-medium">Book Bank (5% Inflation Adjusted)</span><p class="text-slate-400 text-xs mt-0.5">Textbooks, stationery, uniforms. Cost modeled with 5% annual inflation for all 10 years.</p></div></li>
+          <li class="flex items-start gap-3"><i class="fas fa-check-circle text-amber-500 mt-0.5 flex-shrink-0"></i><div><span class="text-white font-medium">Utility & Maintenance Reserve</span><p class="text-slate-400 text-xs mt-0.5">Electricity, water, minor repairs. Conservative buffer included each year.</p></div></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Cost table -->
+    <div class="glass-card rounded-3xl p-8 mt-8">
+      <h3 class="font-semibold text-white mb-6 flex items-center gap-2"><i class="fas fa-table text-emerald-400"></i>Annual Salary Structure</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-white/10">
+              <th class="text-left text-slate-400 pb-3 font-medium">Role</th>
+              <th class="text-center text-slate-400 pb-3 font-medium">Count</th>
+              <th class="text-right text-slate-400 pb-3 font-medium">Monthly</th>
+              <th class="text-right text-slate-400 pb-3 font-medium">Annual</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            <tr><td class="py-3 text-slate-300">Class Teachers (NC–12th)</td><td class="text-center text-slate-300">14</td><td class="text-right font-mono text-emerald-400">₹8,000</td><td class="text-right font-mono text-white">₹13.44 L</td></tr>
+            <tr><td class="py-3 text-slate-300">Principal</td><td class="text-center text-slate-300">1</td><td class="text-right font-mono text-emerald-400">₹15,000</td><td class="text-right font-mono text-white">₹1.80 L</td></tr>
+            <tr><td class="py-3 text-slate-300">Support Staff</td><td class="text-center text-slate-300">5</td><td class="text-right font-mono text-emerald-400">₹5,000</td><td class="text-right font-mono text-white">₹3.00 L</td></tr>
+            <tr class="border-t border-emerald-500/20"><td class="py-3 text-white font-semibold">Total Salaries</td><td class="text-center text-white font-semibold">20</td><td class="text-right">—</td><td class="text-right font-mono font-bold text-emerald-400">₹18.24 L/yr</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO GALLERY -->
+<section id="videos" class="py-20 px-4 sm:px-6 bg-slate-950">
+  <div class="max-w-5xl mx-auto">
+    <p class="section-eyebrow text-center">Ground Reality</p>
+    <h2 class="font-display text-3xl sm:text-4xl font-bold text-white text-center mb-3">Live Construction & Ground Reality Videos</h2>
+    <p class="text-slate-400 text-center mb-12">Raw, unedited documentation — no PR. Just ground truth.</p>
+    <div id="videoGrid" class="grid sm:grid-cols-2 gap-6"></div>
+    <div id="videoPlaceholder" class="glass-card rounded-3xl p-16 text-center hidden">
+      <i class="fas fa-video text-emerald-700 text-5xl mb-4"></i>
+      <p class="text-white font-semibold text-lg mb-2">Videos Locked Until ₹5.77 Cr Milestone</p>
+      <p class="text-slate-400 text-sm max-w-md mx-auto">Construction videos will be published here once the full funding target is achieved and ground is broken.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DONOR LEADERBOARD -->
+<section id="donors" class="py-20 px-4 sm:px-6 bg-slate-900">
+  <div class="max-w-4xl mx-auto">
+    <p class="section-eyebrow text-center">Hall of Change-Makers</p>
+    <h2 class="font-display text-3xl font-bold text-white text-center mb-3">Verified Donor Leaderboard</h2>
+    <p class="text-slate-400 text-center mb-12 text-sm">Only admin-verified donations appear here. Names ranked by contribution size.</p>
+    <div id="donorList" class="space-y-3"></div>
+    <div id="donorEmpty" class="text-center py-16 text-slate-500 hidden">
+      <i class="fas fa-users text-slate-700 text-4xl mb-3"></i>
+      <p>Be the first verified donor. Your name leads this board.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DONATE MODAL -->
+<div id="donateModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-xl font-bold text-white">Make a Donation</h2>
+        <p class="text-slate-400 text-sm mt-1">All details required for verification & leaderboard</p>
+      </div>
+      <button onclick="closeDonateModal()" class="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="space-y-4" id="donateForm">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label>Your Full Name *</label>
+          <input type="text" id="dName" class="input-field" placeholder="Ramesh Kumar"/>
+        </div>
+        <div>
+          <label>Age *</label>
+          <input type="number" id="dAge" class="input-field" placeholder="35" min="18" max="100"/>
+        </div>
+      </div>
+      <div>
+        <label>City / Place *</label>
+        <input type="text" id="dPlace" class="input-field" placeholder="Lucknow, UP"/>
+      </div>
+      <div>
+        <label>Full Address *</label>
+        <textarea id="dAddress" class="input-field" rows="2" placeholder="House no, Street, District, State..."></textarea>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label>Phone (optional)</label>
+          <input type="tel" id="dPhone" class="input-field" placeholder="9876543210"/>
+        </div>
+        <div>
+          <label>Email (optional)</label>
+          <input type="email" id="dEmail" class="input-field" placeholder="you@email.com"/>
+        </div>
+      </div>
+      <div>
+        <label>Donation Amount (₹) *</label>
+        <input type="number" id="dAmount" class="input-field" placeholder="Enter custom amount" min="100"/>
+        <div class="flex gap-2 mt-2 flex-wrap">
+          <button onclick="setAmount(500)" class="text-xs px-3 py-1.5 rounded-lg bg-white/5 hover:bg-emerald-600/20 text-slate-300 border border-white/10 transition">₹500</button>
+          <button onclick="setAmount(1000)" class="text-xs px-3 py-1.5 rounded-lg bg-white/5 hover:bg-emerald-600/20 text-slate-300 border border-white/10 transition">₹1,000</button>
+          <button onclick="setAmount(5000)" class="text-xs px-3 py-1.5 rounded-lg bg-white/5 hover:bg-emerald-600/20 text-slate-300 border border-white/10 transition">₹5,000</button>
+          <button onclick="setAmount(10000)" class="text-xs px-3 py-1.5 rounded-lg bg-white/5 hover:bg-emerald-600/20 text-slate-300 border border-white/10 transition">₹10,000</button>
+          <button onclick="setAmount(50000)" class="text-xs px-3 py-1.5 rounded-lg bg-white/5 hover:bg-emerald-600/20 text-slate-300 border border-white/10 transition">₹50,000</button>
+        </div>
+      </div>
+
+      <div class="bg-emerald-900/20 border border-emerald-700/30 rounded-xl p-4 text-sm">
+        <p class="text-emerald-300 font-medium mb-1"><i class="fas fa-info-circle mr-2"></i>UPI Payment</p>
+        <p class="text-slate-300">After clicking Donate, you'll be redirected to your UPI app to pay:</p>
+        <p class="font-mono text-emerald-400 text-xs mt-1 bg-slate-900/50 px-3 py-1.5 rounded-lg inline-block">MSBRAJWASITRAVELS.eazypay@icici</p>
+        <p class="text-slate-400 text-xs mt-2">Your details are saved. Admin verifies & adds you to the leaderboard.</p>
+      </div>
+
+      <button onclick="submitDonation()" class="btn-primary flex items-center justify-center gap-2">
+        <i class="fas fa-paper-plane"></i>Save Details & Pay via UPI
+      </button>
+    </div>
+
+    <div id="paymentStep" class="hidden text-center py-6">
+      <div class="w-16 h-16 rounded-2xl bg-emerald-700/20 border border-emerald-600/30 flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-mobile-alt text-emerald-400 text-2xl"></i>
+      </div>
+      <h3 class="text-xl font-bold text-white mb-2">Opening UPI App...</h3>
+      <p class="text-slate-400 text-sm mb-4">If UPI didn't open, use this link:</p>
+      <div id="upiLinkBox" class="bg-slate-900 rounded-xl p-4 mb-4"></div>
+      <p class="text-slate-500 text-xs">UPI ID: <span class="text-emerald-400 font-mono">MSBRAJWASITRAVELS.eazypay@icici</span></p>
+      <button onclick="closeDonateModal()" class="btn-secondary mt-4 w-auto px-6 text-sm">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT WIDGET -->
+<div id="chatWidget">
+  <div id="chatBox" class="mb-3">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-emerald-900/30">
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+        <span class="text-white text-sm font-semibold">Chat with Admin</span>
+      </div>
+      <button onclick="toggleChat()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-sm"></i></button>
+    </div>
+
+    <div id="chatSetup" class="p-4 space-y-3">
+      <p class="text-xs text-slate-400 text-center">Enter your details to start chatting</p>
+      <input type="text" id="chatName" class="input-field text-sm" placeholder="Your Name"/>
+      <input type="tel" id="chatPhone" class="input-field text-sm" placeholder="Mobile Number"/>
+      <button onclick="startChat()" class="btn-primary text-sm py-2.5">Start Chat</button>
+    </div>
+
+    <div id="chatActive" class="hidden flex flex-col" style="height:340px;">
+      <div id="chatMessages" class="flex-1 overflow-y-auto p-3 space-y-2 text-xs"></div>
+      <div id="typingIndicator" class="px-3 pb-1 text-xs text-slate-500 italic hidden">Admin is typing...</div>
+      <div class="flex gap-2 p-3 border-t border-white/10">
+        <input type="text" id="chatInput" class="input-field text-sm flex-1 py-2" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()"/>
+        <button onclick="sendMessage()" class="w-9 h-9 flex-shrink-0 rounded-lg bg-emerald-600 hover:bg-emerald-700 flex items-center justify-center text-white transition">
+          <i class="fas fa-paper-plane text-xs"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button onclick="toggleChat()" id="chatToggleBtn" class="ml-auto flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-2xl shadow-lg transition font-medium text-sm"
+    style="display:flex; margin-left:auto;">
+    <i class="fas fa-comments"></i>Chat with Admin
+    <span id="chatBadge" class="hidden w-5 h-5 rounded-full bg-red-500 text-xs flex items-center justify-center">0</span>
+  </button>
+</div>
+
+<!-- SERVICE WORKER + SCRIPTS -->
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const TOTAL_GOAL = 57700000;
+const socket = io();
+let appState = { currentRaised: 4500000, videoLinks: [] };
+let chatSession = { name: '', phone: '', sessionId: '', active: false };
+let unreadChat = 0;
+
+// Format INR
+function formatINR(n) {
+  if (n >= 10000000) return '₹' + (n/10000000).toFixed(2) + ' Cr';
+  if (n >= 100000) return '₹' + (n/100000).toFixed(2) + ' L';
+  return '₹' + n.toLocaleString('en-IN');
+}
+
+// Update UI from state
+function renderState(state) {
+  appState = state;
+  const pct = Math.min((state.currentRaised / TOTAL_GOAL) * 100, 100);
+  document.getElementById('raisedDisplay').textContent = formatINR(state.currentRaised);
+  const bar = document.getElementById('progressBar');
+  bar.style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct.toFixed(1) + '%';
+
+  const badge = document.getElementById('statusBadge');
+  if (state.currentRaised >= TOTAL_GOAL) {
+    badge.className = 'inline-flex items-center gap-2 px-5 py-3 rounded-full border text-sm font-semibold border-emerald-500/40 bg-emerald-900/30 text-emerald-300';
+    badge.innerHTML = '<div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div><span>🎉 Status: Target Achieved! Project Initiated.</span>';
+  } else {
+    badge.className = 'inline-flex items-center gap-2 px-5 py-3 rounded-full border text-sm font-semibold border-amber-500/30 bg-amber-900/15 text-amber-300';
+    badge.innerHTML = '<div class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div><span>Status: Awaiting Full Funding — Construction begins exactly at ₹5.77 Cr</span>';
+  }
+
+  renderVideos(state.videoLinks || []);
+}
+
+function renderVideos(links) {
+  const grid = document.getElementById('videoGrid');
+  const ph = document.getElementById('videoPlaceholder');
+  if (!links || links.length === 0) {
+    grid.innerHTML = '';
+    ph.classList.remove('hidden');
+  } else {
+    ph.classList.add('hidden');
+    grid.innerHTML = links.map(url => `
+      <div class="yt-wrap glass-card">
+        <iframe src="${url}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>`).join('');
+  }
+}
+
+async function loadState() {
+  try {
+    const r = await fetch('/api/state');
+    const s = await r.json();
+    renderState(s);
+  } catch { renderState(appState); }
+}
+
+async function loadDonors() {
+  try {
+    const r = await fetch('/api/donors/public');
+    const donors = await r.json();
+    document.getElementById('donorCount').textContent = donors.length;
+    const list = document.getElementById('donorList');
+    const empty = document.getElementById('donorEmpty');
+    if (!donors.length) { list.innerHTML = ''; empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+    const medals = ['rank-gold','rank-silver','rank-bronze'];
+    list.innerHTML = donors.map((d,i) => `
+      <div class="glass-card rounded-2xl p-5 flex items-center gap-4">
+        <div class="text-2xl font-black font-mono ${medals[i]||'text-slate-500'} w-10 text-center">${i<3?['🥇','🥈','🥉'][i]:`#${i+1}`}</div>
+        <div class="flex-1">
+          <div class="font-semibold text-white">${d.name}</div>
+          <div class="text-xs text-slate-400">${d.place} · ${new Date(d.createdAt).toLocaleDateString('en-IN',{month:'short',year:'numeric'})}</div>
+        </div>
+        <div class="font-mono font-bold text-emerald-400 text-lg">${formatINR(d.amount)}</div>
+      </div>`).join('');
+  } catch {}
+}
+
+// Socket live updates
+socket.on('stateUpdate', renderState);
+socket.on('donorVerified', loadDonors);
+
+// Days counter
+const launchDate = new Date('2024-01-01');
+document.getElementById('daysCount').textContent = Math.floor((new Date() - launchDate) / 86400000);
+
+// ─── Donate Modal ─────────────────────────────────────────────────────────────
+function openDonateModal() {
+  document.getElementById('donateModal').classList.add('open');
+  document.getElementById('donateForm').classList.remove('hidden');
+  document.getElementById('paymentStep').classList.add('hidden');
+}
+function closeDonateModal() {
+  document.getElementById('donateModal').classList.remove('open');
+}
+function setAmount(v) { document.getElementById('dAmount').value = v; }
+
+async function submitDonation() {
+  const name = document.getElementById('dName').value.trim();
+  const age = parseInt(document.getElementById('dAge').value);
+  const place = document.getElementById('dPlace').value.trim();
+  const address = document.getElementById('dAddress').value.trim();
+  const phone = document.getElementById('dPhone').value.trim();
+  const email = document.getElementById('dEmail').value.trim();
+  const amount = parseInt(document.getElementById('dAmount').value);
+
+  if (!name || !age || !place || !address || !amount || amount < 100) {
+    showToast('Please fill all required fields (min ₹100)', 'error'); return;
+  }
+
+  try {
+    const r = await fetch('/api/donors', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, age, place, address, phone, email, amount })
+    });
+    if (!r.ok) throw new Error();
+
+    // Build UPI deep link
+    const upiId = 'MSBRAJWASITRAVELS.eazypay@icici';
+    const upiUrl = `upi://pay?pa=${upiId}&pn=10YearCertaintySchool&am=${amount}&cu=INR&tn=Donation+by+${encodeURIComponent(name)}`;
+    const gpayUrl = `intent://pay?pa=${upiId}&pn=10YearCertaintySchool&am=${amount}&cu=INR&tn=Donation+${name}#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`;
+
+    document.getElementById('donateForm').classList.add('hidden');
+    document.getElementById('paymentStep').classList.remove('hidden');
+    document.getElementById('upiLinkBox').innerHTML = `
+      <a href="${upiUrl}" class="block text-emerald-400 font-mono text-xs break-all hover:underline mb-3">${upiUrl.substring(0,60)}...</a>
+      <div class="flex gap-2 flex-wrap justify-center">
+        <a href="${upiUrl}" class="text-xs px-3 py-2 rounded-lg bg-emerald-700/30 text-emerald-300 border border-emerald-600/30 hover:bg-emerald-700/50 transition">Open UPI</a>
+        <a href="https://gpay.app.goo.gl/?pa=${upiId}&pn=10YrSchool&am=${amount}&cu=INR" target="_blank" class="text-xs px-3 py-2 rounded-lg bg-blue-700/30 text-blue-300 border border-blue-600/30 hover:bg-blue-700/50 transition">Google Pay</a>
+        <a href="phonepe://pay?pa=${upiId}&pn=10YrSchool&am=${amount}&cu=INR" class="text-xs px-3 py-2 rounded-lg bg-purple-700/30 text-purple-300 border border-purple-600/30 hover:bg-purple-700/50 transition">PhonePe</a>
+        <a href="paytmmp://pay?pa=${upiId}&pn=10YrSchool&am=${amount}&cu=INR" class="text-xs px-3 py-2 rounded-lg bg-cyan-700/30 text-cyan-300 border border-cyan-600/30 hover:bg-cyan-700/50 transition">Paytm</a>
+      </div>`;
+
+    // Auto-open UPI
+    window.location.href = upiUrl;
+    showToast('Details saved! Opening UPI app...', 'success');
+  } catch { showToast('Error saving details. Please try again.', 'error'); }
+}
+
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+function toggleChat() {
+  const box = document.getElementById('chatBox');
+  box.classList.toggle('open');
+  if (box.classList.contains('open')) {
+    unreadChat = 0;
+    document.getElementById('chatBadge').classList.add('hidden');
+  }
+}
+
+async function startChat() {
+  const name = document.getElementById('chatName').value.trim();
+  const phone = document.getElementById('chatPhone').value.trim();
+  if (!name || !phone) { showToast('Enter your name and phone number', 'error'); return; }
+  chatSession = { name, phone, sessionId: `${Date.now()}_${phone}`, active: true };
+  socket.emit('joinChat', { sessionId: chatSession.sessionId });
+  document.getElementById('chatSetup').classList.add('hidden');
+  document.getElementById('chatActive').classList.remove('hidden');
+  document.getElementById('chatActive').style.display = 'flex';
+
+  // Load history
+  try {
+    const r = await fetch(`/api/chat/${chatSession.sessionId}`);
+    const msgs = await r.json();
+    msgs.forEach(m => appendMessage(m.message, m.isAdmin));
+  } catch {}
+  showToast(`Welcome ${name}! Admin will respond shortly.`, 'success');
+}
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg || !chatSession.active) return;
+  socket.emit('chatMessage', {
+    senderName: chatSession.name, senderPhone: chatSession.phone,
+    message: msg, isAdmin: false, sessionId: chatSession.sessionId
+  });
+  appendMessage(msg, false);
+  input.value = '';
+}
+
+function appendMessage(text, isAdmin) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `msg-bubble ${isAdmin ? 'msg-admin' : 'msg-user'}`;
+  div.innerHTML = `${isAdmin ? '<span class="text-emerald-400 font-semibold text-xs block mb-1">Admin</span>' : ''}${escapeHtml(text)}`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function escapeHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+socket.on('newMessage', (msg) => {
+  if (msg.sessionId === chatSession.sessionId && msg.isAdmin) {
+    appendMessage(msg.message, true);
+    if (!document.getElementById('chatBox').classList.contains('open')) {
+      unreadChat++;
+      const badge = document.getElementById('chatBadge');
+      badge.textContent = unreadChat;
+      badge.classList.remove('hidden');
+    }
+  }
+});
+
+socket.on('adminTyping', (data) => {
+  if (data.sessionId === chatSession.sessionId) {
+    const ti = document.getElementById('typingIndicator');
+    ti.classList.remove('hidden');
+    clearTimeout(window._typingTimer);
+    window._typingTimer = setTimeout(() => ti.classList.add('hidden'), 2000);
+  }
+});
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type === 'error' ? '#dc2626' : '#059669';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ─── Push Notifications (for user) ───────────────────────────────────────────
+async function registerPush() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    const r = await fetch('/api/push/vapidPublicKey');
+    const { publicKey } = await r.json();
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey)
+    });
+    await fetch('/api/push/subscribe', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription: sub, type: 'admin' })
+    });
+  } catch {}
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+// Init
+loadState();
+loadDonors();
+registerPush();
+
+// Animate progress on load
+setTimeout(() => {
+  const pct = Math.min((appState.currentRaised / TOTAL_GOAL) * 100, 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+}, 300);
+</script>
+</body>
+</html>
